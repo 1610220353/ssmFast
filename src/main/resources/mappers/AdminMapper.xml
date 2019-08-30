@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haha.mapper.AdminMapper">
+
+    <select id="selectId" resultType="com.haha.pojo.Admin">
+
+        select * from admin
+        <where>
+        <if test="AdminID!=null">
+            AdminID = #{AdminID}
+        </if>
+        <if test="AdminAccount!=null">
+          and  AdminAccount = #{AdminAccount}
+        </if>
+          <if test="AdminPwd!=null">
+             and AdminPwd = #{AdminPwd}
+          </if>
+        </where>
+
+
+    </select>
+    <select id="selectAll" resultType="com.haha.pojo.Admin">
+      SELECT
+	AdminAccount,
+	AdminPwd,
+	AdminName,
+	AdminRight,
+	DepartmentName
+FROM
+	admin ad
+	LEFT JOIN adminpopedom adp ON ad.AdminID = adp.AdminID
+	LEFT JOIN department dp ON adp.DepartmentID = dp.DepartmentID
+WHERE
+	ad.AdminID = #{AdminID}
+
+    </select>
+</mapper>

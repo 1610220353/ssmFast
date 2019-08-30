@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+    		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+    		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+    		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+    		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
+    		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+    		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+    		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+    		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.3.xsd
+    		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd ">
+
+    <!--<context:component-scan base-package="com.haha.mapper" >-->
+        <!--&lt;!&ndash;排除了Service注解&ndash;&gt;-->
+        <!--<context:exclude-filter type="annotation"-->
+                                <!--expression="org.springframework.stereotype.Controller"  />-->
+    <!--</context:component-scan>-->
+
+    <context:property-placeholder location="classpath:db.properties"/>
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <property name="driverClassName" value="${driver}" />
+        <property name="url" value="${url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <!-- 配置数据池初始化大小，最大，最小值       -->
+        <!-- 初始化建立物理连接的个数，缺省值为 0        -->
+        <property name="initialSize" value="2" />
+        <!-- 最小连接池数量       -->
+        <property name="minIdle" value="1" />
+        <!-- 最大连接池数量，默认值为 8       -->
+        <property name="maxActive" value="500" />
+        <!-- 获取连接时的最大等待时间，单位毫秒，配置了 maxWait 之后，缺省启用公平锁，
+                   并发效率会有所下降，如果需要可以通过配置 useUnfairLock 属性为 true 使用非公平锁-->
+        <property name="maxWait" value="1800000" />
+        <!-- 配置在 SQL 监控页面显示 SQL 语句，不配置则不显示       -->
+        <property name="filters" value="stat" />
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" >
+        <!-- 注入 dataSource        -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 配置 Mybatis 的全局配置文件        -->
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml" />
+        <!-- 扫描 SQL 需要的配置文件，即 mapper 需要的配置文件        -->
+        <property name="mapperLocations" value="classpath:mappers/*.xml" />
+        <!-- 扫描 POJO 所在包，配置后可以使用别名       -->
+        <property name="typeAliasesPackage" value="com.haha.pojo" />
+        <!-- 插件配置       -->
+        <!--<property name="plugins">-->
+            <!--<array>-->
+                <!--&lt;!&ndash;分页插件的配置，拦截器实现分页功能&ndash;&gt;-->
+                <!--<bean class="com.github.pagehelper.PageInterceptor">-->
+                    <!--&lt;!&ndash;这里有几个配置主要演示如何使用，如果不理解，一定要去掉下面的配置&ndash;&gt;-->
+                    <!--<property name="properties">-->
+                        <!--<value>-->
+                            <!--helperDialect=mysql-->
+                            <!--reasonable=true-->
+                            <!--supportMethodArguments=true-->
+                            <!--params=count=countSql-->
+                            <!--autoRuntimeDialect=true-->
+                        <!--</value>-->
+                    <!--</property>-->
+                <!--</bean>-->
+            <!--</array>-->
+        <!--</property>-->
+    </bean>
+
+    <!--MapperScannerConfigurer是mapper扫描器 然后自动创建代理对象，会将代理对象自动放入spring容器中 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" >
+        <!-- 注入 sqlSessionFactory       -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        <!-- 配置需要扫描的 mapper 包   如果有多个包，那么就使用多个包   -->
+        <property name="basePackage" value="com.haha.mapper" />
+    </bean>
+<!--事务管理器-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager" >
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!--&lt;!&ndash;确定事务管理的策略，transaction-manager：指向上面的transactionManage&ndash;&gt;-->
+    <!--<tx:advice transaction-manager="transactionManager" id="transactionAdvice">-->
+        <!--&lt;!&ndash;事务处理的相关知识以及他的传播性&ndash;&gt;-->
+        <!--<tx:attributes>-->
+            <!--&lt;!&ndash;查询相关配置为只读，select，get，query开头&ndash;&gt;-->
+            <!--<tx:method name="select*" read-only="true"/>-->
+            <!--<tx:method name="get*" read-only="true"/>-->
+            <!--<tx:method name="query*" read-only="true"/>-->
+            <!--<tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception" />-->
+            <!--<tx:method name="update*" propagation="REQUIRED" rollback-for="Exception" />-->
+            <!--<tx:method name="add*" propagation="REQUIRED" rollback-for="Exception" />-->
+            <!--<tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception" />-->
+        <!--</tx:attributes>-->
+    <!--</tx:advice>-->
+
+    <!--使用aop对事务管理管理的范围进行织入  明确几个点1  对哪些地方需要进行事务的管理 execution书写，明确边界
+    2，使用什么策略进行管理，策略我们使用了tx：advice全部书写其中，在我们的aop的advice当中只需要去引用这个事务管理者的建议即可
+    -->
+    <!--<aop:config>-->
+        <!--<aop:pointcut id="txCut" expression="execution(* com.haha.service..*.*(..))" />-->
+        <!--<aop:advisor advice-ref="transactionAdvice" pointcut-ref="txCut" />-->
+    <!--</aop:config>-->
+    <!--采用注解进行事务管理，请在Service的实现类上面加上@Transactional注解-->
+    <!--<tx:annotation-driven transaction-manager="transactionManager" />-->
+</beans>

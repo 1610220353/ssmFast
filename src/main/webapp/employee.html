@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工信息管理</title>
+    <link type="text/css" rel="stylesheet" href="js/jquery-easyui/themes/default/easyui.css"/>
+    <link type="text/css" rel="stylesheet" href="js/jquery-easyui/themes/icon.css"/>
+    <link type="text/css" rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<!--// 主界面-->
+<div class="easyui-layout" data-options="fit:true" id="useBox">
+    <div data-options="region:'center',split:true">
+        <!-- 员工条件查询 -->
+        <div class="easyui-panel">
+            <form id="employeSearch" method="post" >
+                <div class="tableFind" >
+                    <p>
+                        <label>姓名：</label>
+                        <input type="text" id="employeeNameSearch" class="easyui-validatebox" name="employeeNameSearch" style="width: 160px">
+                        <span class="formSpan">*</span>
+
+                        <label>部门：</label>
+                        <input id="employeeSearchDepartment" name="employeeDepartmentSearch" >
+                        <span class="formSpan">*</span>
+
+                        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="searchEmployeeSubmit()">查询</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+
+        <!--        员工列表及新增按钮    -->
+        <div>
+            <table id="employeeTable"></table>
+            <div id="tabelBut">
+                <div>
+                    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-add" id="addEmployeeBtn">新增</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--//新增弹出框-->
+<div id="addEmployeeBox"  style="width: 400px">
+    <form id="addEmployeeForm" method="post" style="margin-top: 20px">
+        <div class="tableFind">
+            <table align="center" cellpadding="4">
+                <tr>
+                    <td>姓名:</td>
+                    <td>
+                        <input type="text" id="employeeName" class="easyui-textbox" name="txtEmployeeName" data-options="required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td>性别:</td>
+                    <td>
+                        <input type="radio"  class="easyui-radiobutton" name="txtEmployeeGender" value="1" label="男" checked>男
+                        <input type="radio"  class="easyui-radiobutton" name="txtEmployeeGender" value="0" label="女" >女
+                    </td>
+                </tr>
+                <tr>
+                    <td>职位:</td>
+                    <td>
+                        <input id="positionName" class="easyui-combotree" name="editPositionName">
+                    </td>
+                </tr>
+                <tr>
+                    <td>所属部门:</td>
+                    <td>
+                        <input class="easyui-combotree" id="employeeDepartment" name="txtEmployeeDepartment">
+                    </td>
+                </tr>
+                <tr>
+                    <td>卡号:</td>
+                    <td>
+                        <input type="text" id="cardNumber" class="easyui-textbox" name="txtCardNumber" data-options="required:true,width:300">
+                    </td>
+                </tr>
+                <tr>
+                    <td>员工状态:</td>
+                    <td>
+                        <select class="easyui-comobox" name="txtemployeeState" id="employeeState" style="width: 60px">
+                            <option value="1" selected>正常</option>
+                            <option value="0">停用</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href="#" class="easyui-linkbutton"  iconCls="icon-ok" id="addEmployeeSubmit" >提交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+<!-- 修改弹出框 -->
+<div id="editEmployeeBox" >
+    <form id="editEmployeeForm" method="post" style="margin-top: 20px">
+        <input type="hidden" id="editIndex" name="editIndex">
+        <div class="tableFind">
+            <table align="center" cellpadding="4">
+                <tr>
+                    <td>员工编号:</td>
+                    <td>
+                        <input type="text" id="editEmployeeID" class="easyui-textbox" name="editEmployeeID" readonly="readonly">
+                    </td>
+                </tr>
+                <tr>
+                    <td>姓名:</td>
+                    <td>
+                        <input type="text" id="editEmployeeName" class="easyui-textbox" name="editEmployeeName" data-options="required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td>性别:</td>
+                    <td>
+                        <input type="radio"  class="easyui-radiobutton" name="editEmployeeGender" value="1" label="男" >男
+                        <input type="radio"  class="easyui-radiobutton" name="editEmployeeGender" value="0" label="女" >女
+                    </td>
+                </tr>
+                <tr>
+                    <td>职位:</td>
+                    <td>
+                        <input id="editPositionName" class="easyui-combotree" name="editPositionName">
+                    </td>
+                </tr>
+                <tr>
+                    <td>所属部门:</td>
+                    <td>
+                        <input class="easyui-combotree" id="editEmployeeDepartment" name="editEmployeeDepartment">
+                    </td>
+                </tr>
+                <tr>
+                    <td>卡号:</td>
+                    <td>
+                        <input type="text" id="editCardNumber" class="easyui-textbox" name="editCardNumber" data-options="required:true,width:300">
+                    </td>
+                </tr>
+                <tr>
+                    <td>员工状态:</td>
+                    <td>
+                        <select class="easyui-comobox" name="editEmployeeState" id="editEmployeeState" style="width: 60px">
+                            <option value="1" selected>正常</option>
+                            <option value="0">停用</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href="#" class="easyui-linkbutton"  iconCls="icon-ok" onclick="editEmployeeSubmit()" >提交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+
+<script src="js/jquery-easyui/jquery.min.js"></script>
+<script src="js/jquery-easyui/jquery.easyui.min.js"></script>
+<script src="js/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+<script src="js/employee.js"></script>
+</body>
+</html>
